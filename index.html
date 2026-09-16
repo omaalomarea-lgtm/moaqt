@@ -369,6 +369,54 @@
   .foot-note{
     text-align:center;font-size:10.5px;color:var(--ink-faint);padding:4px 20px 0;
   }
+
+  .event-personal{font-size:15px;font-weight:600;color:var(--accent);margin-top:-8px;text-align:center;}
+
+  /* ---------- my schedule tab ---------- */
+  .myschedule{display:flex;flex-direction:column;gap:20px;}
+  .ms-head h2{font-size:20px;margin-bottom:4px;}
+  .ms-head p{font-size:13.5px;color:var(--ink-muted);margin:0;line-height:1.6;}
+
+  .ms-upload{
+    border:1.5px dashed var(--border);border-radius:16px;padding:20px 16px;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;
+    text-align:center;background:var(--surface-2);
+  }
+  .ms-upload-icon{font-size:30px;}
+  .ms-upload-title{font-weight:700;font-size:14.5px;}
+  .ms-upload-hint{font-size:12px;color:var(--ink-faint);max-width:36ch;line-height:1.6;}
+  .ms-scan-spin{
+    width:34px;height:34px;border-radius:50%;border:3px solid var(--border);
+    border-top-color:var(--accent);animation:msspin .8s linear infinite;
+  }
+  @keyframes msspin{to{transform:rotate(360deg);}}
+
+  .tp-list{display:flex;flex-direction:column;gap:8px;}
+  .tp-row{
+    display:flex;align-items:center;gap:10px;
+    background:var(--surface);border:1px solid var(--border);border-radius:13px;padding:10px 12px;
+  }
+  .tp-row.off{opacity:.55;background:var(--surface-2);}
+  .tp-time{flex:0 0 auto;width:76px;}
+  .tp-num{font-size:12px;font-weight:700;color:var(--ink);}
+  .tp-range{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--ink-faint);}
+  .tp-fields{flex:1;display:flex;flex-direction:column;gap:6px;min-width:0;}
+  .tp-fields input{
+    border:1px solid var(--border);border-radius:8px;padding:8px 10px;font-size:13px;
+    background:var(--surface);color:var(--ink);width:100%;
+  }
+  .tp-fields input:disabled{opacity:.5;}
+  .tp-empty{
+    flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:3px;
+    font-size:10.5px;color:var(--ink-faint);font-weight:600;
+  }
+  .tp-empty input{accent-color:var(--accent);}
+
+  .ms-chips{display:flex;flex-wrap:wrap;gap:7px;}
+  .ms-chip{
+    border:1px solid var(--border);background:var(--surface-2);color:var(--ink);
+    font-size:12.5px;font-weight:600;padding:7px 13px;border-radius:999px;
+  }
 </style>
 
 <div id="root"></div>
@@ -445,6 +493,12 @@ var VIBE_LEAD = [300, 100, 300];
 var VIBE_END  = [300, 100, 300, 100, 300];
 var KEY_SCHED = "meeqat.schedule.v1";
 var KEY_SETTINGS = "meeqat.settings.v1";
+var KEY_TEACHER = "meeqat.teacher.v1";
+var WEEKDAYS = [0, 1, 2, 3, 4];
+var COMMON_SUBJECTS = ["رياضيات","لغتي","علوم","لغة إنجليزية","تربية إسلامية","دراسات اجتماعية","حاسب","تربية فنية","تربية بدنية","قرآن كريم","فقه","توحيد"];
+// 0.5s of silent 8-bit PCM audio — used only to keep a looping <audio> element
+// alive as a background keep-alive hack on iOS Safari (see makeKeepAlive()).
+var SILENT_WAV = "data:audio/wav;base64,UklGRsQPAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YaAPAACAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA";
 
 /* ============ helpers ============ */
 
@@ -501,16 +555,51 @@ function loadSettings(){
 }
 function saveSettings(s){ try{ localStorage.setItem(KEY_SETTINGS, JSON.stringify(s)); }catch(e){} }
 
-function buildTodayEvents(schedule, nowDate){
+function loadTeacherSchedule(){
+  try{
+    var raw = localStorage.getItem(KEY_TEACHER);
+    if(raw){ var p = JSON.parse(raw); if(p && typeof p === "object") return p; }
+  }catch(e){}
+  return {};
+}
+function saveTeacherSchedule(t){ try{ localStorage.setItem(KEY_TEACHER, JSON.stringify(t)); }catch(e){} }
+
+// the teacher's personal timetable is keyed by actual weekday (0=Sunday..4=Thursday),
+// not by the shared bell-schedule key, because mon_tue_wed shares one bell timing
+// but the teacher's subject/class differ across Monday, Tuesday and Wednesday.
+function periodsForWeekday(schedule, weekday){
+  var key = DAY_TO_KEY[weekday];
+  if(!key) return [];
+  return (schedule[key] || []).filter(function(e){ return e.type === "period"; });
+}
+
+function personalFor(teacherSchedule, weekday, periodIdx){
+  var day = teacherSchedule ? teacherSchedule[weekday] : null;
+  if(!day) return null;
+  var slot = day[periodIdx];
+  if(!slot || slot.isEmpty) return null;
+  var subj = (slot.subject || "").trim(), cls = (slot.className || "").trim();
+  if(!subj || !cls) return null; // only replace the generic announcement once both are filled in
+  return { subject: subj, className: cls };
+}
+
+function buildTodayEvents(schedule, nowDate, teacherSchedule){
   var key = DAY_TO_KEY[nowDate.getDay()];
   if(!key) return { key: null, events: [] };
   var list = schedule[key] || [];
   var y = nowDate.getFullYear(), m = nowDate.getMonth(), d = nowDate.getDate();
+  var weekday = nowDate.getDay();
+  var periodCounter = 0;
   var events = list.map(function(ev, idx){
     var sp = ev.start.split(":"), ep = ev.end.split(":");
     var startMs = new Date(y, m, d, +sp[0], +sp[1], 0, 0).getTime();
     var endMs = new Date(y, m, d, +ep[0], +ep[1], 0, 0).getTime();
-    return { name: ev.name, type: ev.type, start: ev.start, end: ev.end, id: key+"-"+idx, startMs: startMs, endMs: endMs };
+    var personal = null;
+    if(ev.type === "period"){
+      personal = teacherSchedule ? personalFor(teacherSchedule, weekday, periodCounter) : null;
+      periodCounter++;
+    }
+    return { name: ev.name, type: ev.type, start: ev.start, end: ev.end, id: key+"-"+idx, startMs: startMs, endMs: endMs, personal: personal };
   });
   return { key: key, events: events };
 }
@@ -518,7 +607,7 @@ function buildTodayEvents(schedule, nowDate){
 function buildDemoEvents(startDate){
   var base = startDate.getTime();
   var plan = [
-    { name:"حصة تجريبية",         type:"period",   offset:0,  duration:25, leadSec:8 },
+    { name:"حصة تجريبية",         type:"period",   offset:0,  duration:25, leadSec:8, personal:{ subject:"الرياضيات", className:"الرابع أ" } },
     { name:"الفسحة",              type:"break",    offset:25, duration:10, leadSec:4 },
     { name:"حصة نشاط تجريبية",    type:"activity", offset:35, duration:23, leadSec:7 }
   ];
@@ -526,9 +615,86 @@ function buildDemoEvents(startDate){
     return {
       name:p.name, type:p.type, id:"demo-"+idx,
       startMs: base + p.offset*1000, endMs: base + (p.offset+p.duration)*1000,
-      leadSec: p.leadSec
+      leadSec: p.leadSec, personal: p.personal || null
     };
   });
+}
+
+/* ============ .ics calendar export (native OS alarms fallback) ============ */
+
+function icsPad(n){ return n < 10 ? "0"+n : ""+n; }
+
+// Asia/Riyadh has a fixed UTC+3 offset year-round (no DST), so converting to
+// the UTC timestamps .ics needs is a plain 3-hour subtraction — no VTIMEZONE
+// block required for correct alarms in any calendar app.
+function icsDateUTC(y, m, d, hh, mm){
+  var dt = new Date(Date.UTC(y, m, d, hh, mm, 0));
+  dt.setUTCHours(dt.getUTCHours() - 3);
+  return dt.getUTCFullYear() + icsPad(dt.getUTCMonth()+1) + icsPad(dt.getUTCDate()) + "T" +
+    icsPad(dt.getUTCHours()) + icsPad(dt.getUTCMinutes()) + "00Z";
+}
+function icsNextDateForWeekday(base, weekday){
+  var d = new Date(base.getFullYear(), base.getMonth(), base.getDate());
+  var diff = (weekday - d.getDay() + 7) % 7;
+  d.setDate(d.getDate() + diff);
+  return d;
+}
+function icsEscape(s){
+  return String(s).replace(/\\/g,"\\\\").replace(/;/g,"\\;").replace(/,/g,"\\,").replace(/\n/g,"\\n");
+}
+
+function buildICS(schedule, teacherSchedule){
+  var BYDAY = ["SU","MO","TU","WE","TH"];
+  var base = riyadhNow();
+  var stamp = icsDateUTC(base.getFullYear(), base.getMonth(), base.getDate(), base.getHours(), base.getMinutes());
+  var lines = ["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//Meeqat//Teacher Schedule//AR","CALSCALE:GREGORIAN","METHOD:PUBLISH"];
+  WEEKDAYS.forEach(function(wd){
+    var periods = periodsForWeekday(schedule, wd);
+    var occ = icsNextDateForWeekday(base, wd);
+    periods.forEach(function(ev, pIdx){
+      var slot = teacherSchedule && teacherSchedule[wd] ? teacherSchedule[wd][pIdx] : null;
+      if(slot && slot.isEmpty) return; // teacher marked this period as free — no alarm needed
+      var subj = slot && (slot.subject||"").trim(), cls = slot && (slot.className||"").trim();
+      var title = (subj && cls) ? ("حصة " + subj + " — " + cls) : ev.name;
+      var sp = ev.start.split(":"), ep = ev.end.split(":");
+      var dtStart = icsDateUTC(occ.getFullYear(), occ.getMonth(), occ.getDate(), +sp[0], +sp[1]);
+      var dtEnd = icsDateUTC(occ.getFullYear(), occ.getMonth(), occ.getDate(), +ep[0], +ep[1]);
+      var uid = "meeqat-" + wd + "-" + pIdx + "-" + Math.random().toString(36).slice(2) + "@meeqat.app";
+      lines.push("BEGIN:VEVENT");
+      lines.push("UID:" + uid);
+      lines.push("DTSTAMP:" + stamp);
+      lines.push("DTSTART:" + dtStart);
+      lines.push("DTEND:" + dtEnd);
+      lines.push("RRULE:FREQ=WEEKLY;BYDAY=" + BYDAY[wd]);
+      lines.push("SUMMARY:" + icsEscape(title));
+      lines.push("BEGIN:VALARM");
+      lines.push("ACTION:DISPLAY");
+      lines.push("DESCRIPTION:" + icsEscape("تبقّى 5 دقائق على نهاية " + title));
+      lines.push("TRIGGER;RELATED=END:-PT5M");
+      lines.push("END:VALARM");
+      lines.push("BEGIN:VALARM");
+      lines.push("ACTION:DISPLAY");
+      lines.push("DESCRIPTION:" + icsEscape("انتهت " + title));
+      lines.push("TRIGGER;RELATED=END:PT0S");
+      lines.push("END:VALARM");
+      lines.push("END:VEVENT");
+    });
+  });
+  lines.push("END:VCALENDAR");
+  return lines.join("\r\n");
+}
+
+function downloadICS(schedule, teacherSchedule){
+  try{
+    var content = buildICS(schedule, teacherSchedule);
+    var blob = new Blob([content], { type:"text/calendar;charset=utf-8" });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = url; a.download = "meeqat-schedule.ics";
+    document.body.appendChild(a); a.click();
+    setTimeout(function(){ try{ document.body.removeChild(a); URL.revokeObjectURL(url); }catch(e){} }, 1200);
+    return true;
+  }catch(e){ return false; }
 }
 
 /* ============ audio & vibration ============ */
@@ -570,6 +736,66 @@ function makeSound(){
 function vibrate(pattern, on){
   if(!on) return;
   try{ if(navigator.vibrate) navigator.vibrate(pattern); }catch(e){}
+}
+
+/* ============ background keep-alive (silent audio loop) ============
+   Mobile OSes throttle/suspend a tab's JS timers once the screen locks or
+   the browser is backgrounded, which would silently stop the countdown and
+   the alert checkpoints. A continuously-playing (silent) audio stream is
+   the standard trick browsers respect as "this page still needs to run":
+   a looping AudioContext buffer source for Chrome/Android, plus a looping
+   <audio> element (more reliable on iOS Safari specifically) using a tiny
+   silent WAV. This raises the odds background alerts keep firing — it is
+   not a guarantee, since the OS can still suspend the tab outright, which
+   is why the .ics calendar sync exists as a native-alarm fallback. */
+function makeKeepAlive(){
+  var ctx = null, src = null, gainNode = null, audioEl = null;
+  function ensureCtx(){
+    try{
+      var C = window.AudioContext || window.webkitAudioContext;
+      if(!ctx) ctx = new C();
+      if(ctx.state === "suspended") ctx.resume().catch(function(){});
+    }catch(e){ ctx = null; }
+    return ctx;
+  }
+  function start(){
+    var c = ensureCtx();
+    if(c && !src){
+      try{
+        var buffer = c.createBuffer(1, c.sampleRate, c.sampleRate);
+        src = c.createBufferSource();
+        src.buffer = buffer;
+        src.loop = true;
+        gainNode = c.createGain();
+        gainNode.gain.value = 0.0001;
+        src.connect(gainNode); gainNode.connect(c.destination);
+        src.start(0);
+      }catch(e){}
+    }
+    try{
+      if(!audioEl){
+        audioEl = document.createElement("audio");
+        audioEl.loop = true;
+        audioEl.setAttribute("playsinline", "");
+        audioEl.volume = 0.01;
+        audioEl.src = SILENT_WAV;
+        audioEl.style.display = "none";
+        document.body.appendChild(audioEl);
+      }
+      var p = audioEl.play();
+      if(p && p.catch) p.catch(function(){});
+    }catch(e){}
+  }
+  function resume(){
+    ensureCtx();
+    try{ if(audioEl && audioEl.paused){ var p = audioEl.play(); if(p && p.catch) p.catch(function(){}); } }catch(e){}
+  }
+  function stop(){
+    try{ if(src){ src.stop(); src.disconnect(); } }catch(e){}
+    src = null;
+    try{ if(audioEl){ audioEl.pause(); } }catch(e){}
+  }
+  return { start: start, resume: resume, stop: stop };
 }
 
 /* ============ Arabic voice announcements (Web Speech API) ============ */
@@ -702,7 +928,8 @@ function EventArea(props){
         timerText: fmtCountdown(remain),
         subText: alerting ? "قارب على الانتهاء" : "الوقت المتبقي"
       }),
-      h("div", { className:"event-name" }, ev.name)
+      h("div", { className:"event-name" }, ev.name),
+      ev.personal ? h("div", { className:"event-personal" }, ev.personal.subject + " · " + ev.personal.className) : null
     ),
     h("div", { className:"next-strip" },
       h("div", null,
@@ -859,6 +1086,151 @@ function SettingsModal(props){
   );
 }
 
+/* ============ my schedule tab (Phase 2: teacher personalization) ============ */
+
+function TeacherPeriodRow(props){
+  var ev = props.ev, idx = props.idx, onChange = props.onChange;
+  var slot = props.slot || { subject:"", className:"", isEmpty:false };
+  function patch(p){ onChange(idx, Object.assign({}, slot, p)); }
+  return h("div", { className:"tp-row" + (slot.isEmpty ? " off" : "") },
+    h("div", { className:"tp-time" },
+      h("div", { className:"tp-num" }, "الحصة " + (idx+1)),
+      h("div", { className:"tp-range" }, ev.start + " – " + ev.end)
+    ),
+    h("div", { className:"tp-fields" },
+      h("input", { type:"text", placeholder:"اسم المادة", value:slot.subject||"", disabled:slot.isEmpty,
+        onChange:function(e){ patch({ subject:e.target.value }); } }),
+      h("input", { type:"text", placeholder:"الصف / الفصل", value:slot.className||"", disabled:slot.isEmpty,
+        onChange:function(e){ patch({ className:e.target.value }); } })
+    ),
+    h("label", { className:"tp-empty" },
+      h("input", { type:"checkbox", checked:!!slot.isEmpty, onChange:function(e){ patch({ isEmpty:e.target.checked }); } }),
+      h("span", null, "فراغ")
+    )
+  );
+}
+
+function MyScheduleTab(props){
+  var schedule = props.schedule;
+  var teacherSchedule = props.teacherSchedule, setTeacherSchedule = props.setTeacherSchedule;
+  var wdState = useState(riyadhNow().getDay() <= 4 ? riyadhNow().getDay() : 0);
+  var wd = wdState[0], setWd = wdState[1];
+  var scanState = useState(null); var scanning = scanState[0], setScanning = scanState[1];
+  var jsonState = useState(""); var jsonText = jsonState[0], setJsonText = jsonState[1];
+  var msgState = useState(null); var msg = msgState[0], setMsg = msgState[1];
+  var fileRef = useRef(null);
+
+  var periods = periodsForWeekday(schedule, wd);
+  var daySlots = teacherSchedule[wd] || [];
+
+  function updateSlot(idx, slot){
+    var nextDay = daySlots.slice();
+    nextDay[idx] = slot;
+    setTeacherSchedule(Object.assign({}, teacherSchedule, { [wd]: nextDay }));
+  }
+  function quickFill(subject){
+    var idx = -1;
+    for(var i=0;i<periods.length;i++){
+      var sl = daySlots[i];
+      if(!sl || (!sl.subject && !sl.isEmpty)){ idx = i; break; }
+    }
+    if(idx === -1) return;
+    updateSlot(idx, Object.assign({}, daySlots[idx]||{}, { subject: subject, isEmpty:false }));
+  }
+  function onPickImage(e){
+    var file = e.target.files && e.target.files[0];
+    if(fileRef.current) fileRef.current.value = "";
+    if(!file) return;
+    setScanning({ name:file.name });
+    setTimeout(function(){
+      setScanning(null);
+      setMsg({ ok:true, text:"تم رفع الصورة — راجع حصص يوم " + DAY_NAMES[wd] + " أدناه وأكمل المواد والفصول بسرعة." });
+    }, 1300);
+  }
+  function doExport(){ setJsonText(JSON.stringify(teacherSchedule, null, 2)); setMsg(null); }
+  function doImport(){
+    try{
+      var parsed = JSON.parse(jsonText);
+      if(typeof parsed !== "object" || !parsed) throw new Error("bad json");
+      setTeacherSchedule(parsed);
+      setMsg({ ok:true, text:"تم استيراد جدولك الخاص بنجاح." });
+    }catch(e){
+      setMsg({ ok:false, text:"تعذّر الاستيراد — تأكد أن النص JSON صالح." });
+    }
+  }
+  function resetDay(){
+    var next = Object.assign({}, teacherSchedule);
+    delete next[wd];
+    setTeacherSchedule(next);
+    setMsg({ ok:true, text:"تم مسح حصص يوم " + DAY_NAMES[wd] + "." });
+  }
+  function doSync(){
+    var ok = downloadICS(schedule, teacherSchedule);
+    setMsg(ok ? { ok:true, text:"جارٍ تنزيل ملف iCal — افتحه لإضافة التنبيهات كمنبّهات أصلية في تقويم جوالك. لا يعمل التنزيل داخل معاينة الـ Artifact الحالية؛ يعمل بشكل كامل فور نشر التطبيق كموقع PWA مستقل." }
+              : { ok:false, text:"تعذّر إنشاء ملف التقويم على هذا المتصفح." });
+  }
+
+  return h("div", { className:"myschedule" },
+    h("div", { className:"ms-head" },
+      h("h2", null, "جدولي الخاص"),
+      h("p", null, "أدخل مادة وفصل كل حصة ليُعلن ميقات اسم المادة والصف بصوت واضح عند التنبيه، بدل الاسم العام للحصة.")
+    ),
+
+    h("div", { className:"ms-upload", onClick:function(){ if(!scanning && fileRef.current) fileRef.current.click(); } },
+      h("input", { ref:fileRef, type:"file", accept:"image/*", capture:"environment", style:{ display:"none" }, onChange:onPickImage }),
+      scanning
+        ? h(React.Fragment, null,
+            h("div", { className:"ms-scan-spin" }),
+            h("div", null, "جارٍ مسح \"" + scanning.name + "\"…")
+          )
+        : h(React.Fragment, null,
+            h("div", { className:"ms-upload-icon" }, "📷"),
+            h("div", { className:"ms-upload-title" }, "ارفع صورة جدولك الخاص أو التقط صورة"),
+            h("div", { className:"ms-upload-hint" }, "نسخة تجريبية من الماسح: يفتح لك ميقات جدول اليوم أدناه فورًا لمراجعته وإكماله بسرعة، دون قراءة فعلية لنص الصورة بعد.")
+          )
+    ),
+
+    h("div", { className:"day-tabs" },
+      WEEKDAYS.map(function(d){
+        return h("button", { key:d, className:"day-tab" + (wd===d?" on":""), onClick:function(){ setWd(d); } }, DAY_NAMES[d]);
+      })
+    ),
+
+    h("div", { className:"tp-list" },
+      periods.length ? periods.map(function(ev, idx){
+        return h(TeacherPeriodRow, { key:idx, ev:ev, idx:idx, slot:daySlots[idx], onChange:updateSlot });
+      }) : h("div", { className:"note" }, "لا توجد حصص مجدولة هذا اليوم.")
+    ),
+
+    periods.length ? h("div", null,
+      h("div", { className:"fs", style:{ marginBottom:8 } }, "تعبئة سريعة — تضاف لأول حصة فارغة"),
+      h("div", { className:"ms-chips" },
+        COMMON_SUBJECTS.map(function(s){
+          return h("button", { key:s, className:"ms-chip", onClick:function(){ quickFill(s); } }, s);
+        })
+      )
+    ) : null,
+
+    h("div", { className:"btn-row" },
+      h("button", { className:"btn primary", onClick:doSync }, "🗓️ مزامنة الحصص مع تقويم الهاتف (iCal)"),
+      h("button", { className:"btn danger", onClick:resetDay }, "مسح حصص هذا اليوم")
+    ),
+    h("div", { className:"note" }, "المزامنة تنشئ تنبيهات أصلية في تقويم جوالك (قبل 5 دقائق + عند الانتهاء) تعمل حتى لو أُغلق المتصفح تمامًا — استخدمها كضمان إضافي لتنبيهات ميقات داخل الصفحة. ملاحظة: تنزيل الملفات معطّل داخل معاينة الـ Artifact نفسها لأسباب أمنية؛ الزر يعمل بشكل طبيعي حين يفتح التطبيق كموقع منشور فعليًا على الجوال."),
+
+    h("div", null,
+      h("div", { className:"sec-title" }, "نسخ احتياطي JSON"),
+      h("textarea", { className:"json", value:jsonText, onChange:function(e){ setJsonText(e.target.value); },
+        placeholder:"اضغط تصدير لعرض جدولك الخاص، أو الصق نسخة محفوظة هنا ثم استيراد" }),
+      h("div", { className:"btn-row", style:{ marginTop:8 } },
+        h("button", { className:"btn", onClick:doExport }, "تصدير"),
+        h("button", { className:"btn primary", onClick:doImport }, "استيراد")
+      )
+    ),
+
+    msg ? h("div", { className: msg.ok ? "ok-msg" : "err" }, msg.text) : null
+  );
+}
+
 /* ============ overlays ============ */
 
 function EndingBanner(props){
@@ -888,6 +1260,8 @@ function App(){
   var settingsOpenState = useState(false); var settingsOpen = settingsOpenState[0], setSettingsOpen = settingsOpenState[1];
   var demoState = useState(false); var demoMode = demoState[0], setDemoMode = demoState[1];
   var overlayState = useState(null); var overlay = overlayState[0], setOverlay = overlayState[1];
+  var teacherState = useState(loadTeacherSchedule()); var teacherSchedule = teacherState[0], setTeacherSchedule = teacherState[1];
+  var viewState = useState("home"); var view = viewState[0], setView = viewState[1];
 
   var demoEventsRef = useRef(null);
   var alertMapRef = useRef({});
@@ -895,9 +1269,11 @@ function App(){
   var voiceRef = useRef(null);
   var wakeLockRef = useRef(null);
   var overlayTimerRef = useRef(null);
+  var keepAliveRef = useRef(null);
 
   if(!soundRef.current) soundRef.current = makeSound();
   if(!voiceRef.current) voiceRef.current = makeVoice();
+  if(!keepAliveRef.current) keepAliveRef.current = makeKeepAlive();
 
   // self-correcting tick loop, aligned to wall-clock seconds using Date.now() —
   // avoids drift from throttled/queued setInterval callbacks in background tabs
@@ -922,6 +1298,7 @@ function App(){
       if(!document.hidden){
         setNow(riyadhNow());
         if(started && settings.wakeLockOn) acquireWakeLock(wakeLockRef);
+        if(started) keepAliveRef.current.resume();
       }
     }
     document.addEventListener("visibilitychange", onVisible);
@@ -930,8 +1307,9 @@ function App(){
 
   useEffect(function(){ saveSettings(settings); }, [settings]);
   useEffect(function(){ saveSchedule(schedule); }, [schedule]);
+  useEffect(function(){ saveTeacherSchedule(teacherSchedule); }, [teacherSchedule]);
 
-  var liveBuilt = buildTodayEvents(schedule, now);
+  var liveBuilt = buildTodayEvents(schedule, now, teacherSchedule);
   var dayKey = liveBuilt.key;
   var liveEvents = liveBuilt.events;
   var activeEvents = demoMode ? (demoEventsRef.current || []) : liveEvents;
@@ -970,7 +1348,7 @@ function App(){
     }
   }, [started, settings.wakeLockOn, currentEvent && currentEvent.id]);
   useEffect(function(){
-    return function(){ releaseWakeLock(wakeLockRef); };
+    return function(){ releaseWakeLock(wakeLockRef); keepAliveRef.current.stop(); };
   }, []);
 
   // reset per-event alert tracking when the active list identity changes
@@ -978,7 +1356,7 @@ function App(){
 
   // scan for checkpoint/end alert transitions every tick
   useEffect(function(){
-    var built = demoMode ? (demoEventsRef.current || []) : buildTodayEvents(schedule, now).events;
+    var built = demoMode ? (demoEventsRef.current || []) : buildTodayEvents(schedule, now, teacherSchedule).events;
     var nm = now.getTime();
     built.forEach(function(ev, idx){
       var state = alertMapRef.current[ev.id] || {};
@@ -989,11 +1367,14 @@ function App(){
           state.ended = true;
           if(allowed){
             if(settings.soundOn) soundRef.current.end();
+            var endText = ev.personal
+              ? ("انتهت حصة " + ev.personal.subject + " للصف " + ev.personal.className + "، شكراً لجهودكم")
+              : ("انتهت " + ev.name + "، شكرًا لجهودكم");
             if(settings.voiceOn){
-              setTimeout(function(){ voiceRef.current.speak("انتهت " + ev.name + "، شكرًا لجهودكم"); }, 480);
+              setTimeout(function(){ voiceRef.current.speak(endText); }, 480);
             }
             vibrate(VIBE_END, settings.vibrationOn);
-            notifyBanner("ميقات — انتهى الوقت", "انتهت " + ev.name);
+            notifyBanner("ميقات — انتهى الوقت", ev.personal ? (ev.personal.subject + " — " + ev.personal.className) : ("انتهت " + ev.name));
             var nxt = built[idx+1] || null;
             setOverlay({ type:"ended", event: ev, next: nxt });
             if(overlayTimerRef.current) clearTimeout(overlayTimerRef.current);
@@ -1012,12 +1393,15 @@ function App(){
             state.cps[cpId] = true;
             if(allowed){
               if(settings.soundOn) soundRef.current.lead();
+              var label = checkpointLabel(cp);
+              var leadText = ev.personal
+                ? ("تنبيه: تبقى " + label + " على نهاية حصة " + ev.personal.subject + " للصف " + ev.personal.className)
+                : ("تنبيه: تبقى " + label + " على نهاية " + ev.name);
               if(settings.voiceOn){
-                var label = checkpointLabel(cp);
-                setTimeout(function(){ voiceRef.current.speak("تنبيه: تبقى " + label + " على نهاية " + ev.name); }, 420);
+                setTimeout(function(){ voiceRef.current.speak(leadText); }, 420);
               }
               vibrate(VIBE_LEAD, settings.vibrationOn);
-              notifyBanner("ميقات — اقترب الوقت", ev.name + " — متبقٍ " + checkpointLabel(cp));
+              notifyBanner("ميقات — اقترب الوقت", (ev.personal ? (ev.personal.subject + " — " + ev.personal.className) : ev.name) + " — متبقٍ " + checkpointLabel(cp));
               setOverlay({ type:"ending", event: ev, remainMs: ev.endMs - nm });
               if(overlayTimerRef.current) clearTimeout(overlayTimerRef.current);
               overlayTimerRef.current = setTimeout(function(){
@@ -1048,6 +1432,7 @@ function App(){
     voiceRef.current.warmUp();
     requestNotifPermission();
     if(settings.wakeLockOn) acquireWakeLock(wakeLockRef);
+    keepAliveRef.current.start();
   }
   function testSoundAndVoice(){
     // always runs, regardless of the mute/voice toggles — its whole purpose
@@ -1063,6 +1448,7 @@ function App(){
     setOverlay(null);
     setDemoMode(true);
     setSettingsOpen(false);
+    setView("home");
   }
   function stopDemo(){
     setDemoMode(false);
@@ -1089,7 +1475,7 @@ function App(){
           h("div", { className:"hint" }, "يفعّل الضغط الصوت والاهتزاز لهذه الجلسة"),
           h("div", { className:"credits" },
             h("div", { className:"item principal" }, h("div", { className:"lbl" }, "مدير المدرسة"), h("div", { className:"val" }, "الأستاذ معتز الشامخ")),
-            h("div", { className:"item" }, h("div", { className:"lbl" }, "فكرة البرنامج"), h("div", { className:"val" }, "الأستاذ محمود مهرات")),
+            h("div", { className:"item" }, h("div", { className:"lbl" }, "فكرة البرنامج"), h("div", { className:"val" }, "الأستاذ محمود مهران")),
             h("div", { className:"item" }, h("div", { className:"lbl" }, "تنفيذ البرنامج"), h("div", { className:"val" }, "الأستاذ فتحي سيف النصر"))
           )
         ),
@@ -1147,6 +1533,10 @@ function App(){
           onClick:function(){ setSettings(Object.assign({}, settings, { wakeLockOn: !settings.wakeLockOn })); }
         }, settings.wakeLockOn ? "🔆" : "🌙"),
         h(IconBtn, { title: settings.soundOn ? "كتم الصوت" : "تفعيل الصوت", mutedStyle: !settings.soundOn, onClick:toggleMute }, settings.soundOn ? "🔊" : "🔇"),
+        h(IconBtn, {
+          title:"جدولي الخاص", active: view === "myschedule",
+          onClick:function(){ if(demoMode) stopDemo(); setView(view === "myschedule" ? "home" : "myschedule"); }
+        }, "📋"),
         h(IconBtn, { title:"الإعدادات", onClick:function(){ setSettingsOpen(true); } }, "⚙️")
       )
     ),
@@ -1154,14 +1544,18 @@ function App(){
     overlay && overlay.type === "ending" ? h(EndingBanner, { event: overlay.event, remainMs: overlay.remainMs }) : null,
 
     h("div", { className:"content" },
-      demoMode ? h("div", { className:"demo-strip" },
-        h("span", null, "▶ وضع العرض التجريبي — يعرض دورة كاملة من التنبيهات خلال ثوانٍ"),
-        h("button", { onClick:stopDemo }, "إنهاء")
-      ) : null,
-      mainContent
+      view === "myschedule"
+        ? h(MyScheduleTab, { schedule:schedule, teacherSchedule:teacherSchedule, setTeacherSchedule:setTeacherSchedule })
+        : h(React.Fragment, null,
+            demoMode ? h("div", { className:"demo-strip" },
+              h("span", null, "▶ وضع العرض التجريبي — يعرض دورة كاملة من التنبيهات خلال ثوانٍ"),
+              h("button", { onClick:stopDemo }, "إنهاء")
+            ) : null,
+            mainContent
+          )
     ),
 
-    h("div", { className:"foot-note" }, "معاينة تفاعلية كاملة الوظائف. إبقاء الشاشة نشطة والتنبيهات خارج التطبيق تعمل ما دام التطبيق مفتوحًا في المقدمة — لا يوجد متصفح يشغّل مؤقتًا حقيقيًا بعد إغلاق التطبيق تمامًا أو تبديل التطبيقات."),
+    view === "home" ? h("div", { className:"foot-note" }, "معاينة تفاعلية كاملة الوظائف. يحاول التطبيق إبقاء تشغيله في الخلفية عبر بث صوتي صامت مستمر، لكن نظام الجوال قد يوقفه بعد إغلاق التطبيق تمامًا أو تبديل التطبيقات — لضمان لا يفوّت أبدًا استخدم مزامنة التقويم (iCal) من «جدولي الخاص» 📋.") : null,
 
     overlay && overlay.type === "ended" ? h(EndedOverlay, { event: overlay.event, next: overlay.next, onClose:function(){ setOverlay(null); } }) : null,
     settingsOpen ? h(SettingsModal, { settings:settings, setSettings:setSettings, schedule:schedule, setSchedule:setSchedule, onClose:function(){ setSettingsOpen(false); }, onTest:testSoundAndVoice }) : null
