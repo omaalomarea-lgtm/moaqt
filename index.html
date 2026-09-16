@@ -1,0 +1,950 @@
+<title>ميقات</title>
+<meta name="description" content="تطبيق ميقات التفاعلي — عدّاد الحصص الذكي مع تنبيهات صوتية واهتزاز وجدول رسمي يتبدّل تلقائيًا حسب يوم الأسبوع.">
+<style>
+  :root{
+    --bg:#FAF9F4;
+    --surface:#FFFFFF;
+    --surface-2:#F1EEE3;
+    --surface-3:#E9E5D6;
+    --ink:#1E2724;
+    --ink-muted:#5C675F;
+    --ink-faint:#8B948C;
+    --border:#E4E0D2;
+    --accent:#0E6E5B;
+    --accent-ink:#FFFFFF;
+    --accent-soft:#E3F1EC;
+    --amber:#B4740B;
+    --amber-ink:#FFFFFF;
+    --amber-soft:#FBEDD3;
+    --danger:#AE4038;
+    --danger-soft:#F7E4E1;
+    --violet:#6C5FC2;
+    --violet-soft:#EAE7F8;
+    --shadow: 0 1px 2px rgba(30,39,36,.06), 0 10px 30px -14px rgba(30,39,36,.22);
+  }
+  :root:not([data-theme="light"]){
+    @media (prefers-color-scheme: dark){
+      --bg:#0F1412;
+      --surface:#161F1B;
+      --surface-2:#1C2622;
+      --surface-3:#243029;
+      --ink:#ECEFEA;
+      --ink-muted:#9DAAA2;
+      --ink-faint:#6D7B73;
+      --border:#293530;
+      --accent:#54D6B0;
+      --accent-ink:#052A21;
+      --accent-soft:#173B32;
+      --amber:#E7A845;
+      --amber-ink:#2B1C02;
+      --amber-soft:#3B2C13;
+      --danger:#E3847A;
+      --danger-soft:#3B211E;
+      --violet:#A79AF0;
+      --violet-soft:#251F42;
+      --shadow: 0 1px 2px rgba(0,0,0,.35), 0 10px 30px -14px rgba(0,0,0,.6);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#0F1412;
+    --surface:#161F1B;
+    --surface-2:#1C2622;
+    --surface-3:#243029;
+    --ink:#ECEFEA;
+    --ink-muted:#9DAAA2;
+    --ink-faint:#6D7B73;
+    --border:#293530;
+    --accent:#54D6B0;
+    --accent-ink:#052A21;
+    --accent-soft:#173B32;
+    --amber:#E7A845;
+    --amber-ink:#2B1C02;
+    --amber-soft:#3B2C13;
+    --danger:#E3847A;
+    --danger-soft:#3B211E;
+    --violet:#A79AF0;
+    --violet-soft:#251F42;
+    --shadow: 0 1px 2px rgba(0,0,0,.35), 0 10px 30px -14px rgba(0,0,0,.6);
+  }
+
+  *{box-sizing:border-box;}
+  html,body{height:100%;background:var(--bg);}
+  body{
+    margin:0;
+    font-family:"IBM Plex Sans Arabic","Tahoma",sans-serif;
+    color:var(--ink);
+    background:var(--bg);
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+    padding-inline:0;
+  }
+  button,input,select,textarea{font-family:inherit;}
+  button{cursor:pointer;}
+  h1,h2,h3{font-family:"Cairo",sans-serif;margin:0;}
+
+  #root{min-height:100%;display:flex;justify-content:center;padding-block:0;}
+
+  .frame{
+    width:100%;max-width:430px;min-height:100vh;min-height:100dvh;
+    background:var(--bg);
+    display:flex;flex-direction:column;
+    position:relative;
+    padding-bottom:env(safe-area-inset-bottom,0px);
+  }
+  @media (min-width:560px){
+    #root{padding-block:28px;}
+    .frame{min-height:840px;height:840px;border-radius:28px;overflow:hidden;box-shadow:var(--shadow);border:1px solid var(--border);}
+  }
+
+  /* ---------- gate screen ---------- */
+  .gate{
+    flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:18px;text-align:center;padding:32px 28px;
+    background:radial-gradient(600px 320px at 50% -10%, var(--accent-soft), transparent 65%);
+  }
+  .gate .mark{
+    width:84px;height:84px;border-radius:24px;background:var(--accent);color:var(--accent-ink);
+    display:flex;align-items:center;justify-content:center;font-size:38px;box-shadow:var(--shadow);
+  }
+  .gate h1{font-size:26px;font-weight:800;}
+  .gate p{color:var(--ink-muted);font-size:14.5px;max-width:32ch;margin:0;}
+  .gate .go{
+    margin-top:10px;background:var(--accent);color:var(--accent-ink);border:none;
+    font-family:"Cairo",sans-serif;font-weight:700;font-size:16px;
+    padding:14px 40px;border-radius:14px;box-shadow:var(--shadow);
+  }
+  .gate .hint{font-size:12px;color:var(--ink-faint);margin-top:2px;}
+
+  /* ---------- header ---------- */
+  .header{
+    position:sticky;top:env(safe-area-inset-top,0px);z-index:5;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:14px 16px;border-bottom:1px solid var(--border);
+    background:color-mix(in srgb, var(--surface) 92%, transparent);
+    backdrop-filter:blur(6px);
+  }
+  .header .brand{display:flex;align-items:center;gap:9px;}
+  .header .brand .dot{width:9px;height:9px;border-radius:50%;background:var(--accent);}
+  .header .brand b{font-family:"Cairo",sans-serif;font-weight:800;font-size:15.5px;}
+  .header .clock{
+    font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums;
+    font-size:11.5px;color:var(--ink-muted);margin-top:1px;
+  }
+  .header .actions{display:flex;gap:6px;}
+  .icon-btn{
+    width:36px;height:36px;border-radius:10px;border:1px solid var(--border);
+    background:var(--surface-2);color:var(--ink);
+    display:flex;align-items:center;justify-content:center;font-size:16px;
+  }
+  .icon-btn.active{background:var(--accent-soft);border-color:transparent;color:var(--accent);}
+  .icon-btn.muted{background:var(--danger-soft);border-color:transparent;color:var(--danger);}
+
+  .content{flex:1;overflow-y:auto;padding:20px 18px 32px;display:flex;flex-direction:column;gap:16px;}
+
+  .demo-strip{
+    display:flex;align-items:center;justify-content:space-between;gap:10px;
+    background:var(--violet-soft);border:1px solid color-mix(in srgb, var(--violet) 35%, transparent);
+    color:var(--violet);padding:9px 13px;border-radius:12px;font-size:12.5px;font-weight:600;
+  }
+  .demo-strip button{
+    background:var(--violet);color:#fff;border:none;border-radius:8px;
+    padding:5px 11px;font-size:11.5px;font-weight:700;
+  }
+
+  /* ---------- state screens (weekend / waiting / done) ---------- */
+  .state-screen{
+    flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    text-align:center;gap:10px;padding:28px 10px;min-height:340px;
+  }
+  .state-screen .icon{
+    width:64px;height:64px;border-radius:18px;display:flex;align-items:center;justify-content:center;
+    font-size:30px;margin-bottom:6px;
+  }
+  .state-screen h2{font-size:19px;}
+  .state-screen p{color:var(--ink-muted);font-size:14px;max-width:30ch;margin:0;}
+  .state-screen .countdown{
+    font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums;
+    font-size:34px;font-weight:600;color:var(--accent);margin-top:4px;
+  }
+  .ghost-btn{
+    margin-top:14px;background:transparent;border:1px solid var(--border);color:var(--ink-muted);
+    font-size:13px;font-weight:600;padding:9px 18px;border-radius:11px;
+  }
+
+  /* ---------- event card ---------- */
+  .event-card{
+    background:var(--surface);border:1px solid var(--border);border-radius:20px;
+    padding:26px 20px 22px;box-shadow:var(--shadow);
+    display:flex;flex-direction:column;align-items:center;gap:14px;
+    transition:border-color .3s, background .3s;
+  }
+  .event-card.alerting{border-color:color-mix(in srgb, var(--amber) 55%, transparent);background:var(--amber-soft);}
+  .type-chip{
+    display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:700;
+    background:var(--surface-2);border:1px solid var(--border);color:var(--ink-muted);
+    padding:4px 12px;border-radius:999px;
+  }
+  .event-card.alerting .type-chip{background:var(--amber);color:var(--amber-ink);border-color:transparent;}
+
+  .ring-wrap{position:relative;width:196px;height:196px;}
+  .ring-wrap svg{width:100%;height:100%;transform:rotate(-90deg);}
+  .ring-center{
+    position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
+  }
+  .ring-center .timer{
+    font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums;
+    font-size:38px;font-weight:700;letter-spacing:-.02em;
+  }
+  .ring-center .label{font-size:11.5px;color:var(--ink-muted);}
+
+  .event-name{font-family:"Cairo",sans-serif;font-weight:800;font-size:19px;text-align:center;}
+
+  .next-strip{
+    width:100%;display:flex;align-items:center;justify-content:space-between;gap:10px;
+    background:var(--surface-2);border:1px solid var(--border);border-radius:13px;
+    padding:11px 14px;font-size:13px;
+  }
+  .next-strip .lbl{color:var(--ink-faint);font-size:11.5px;}
+  .next-strip .val{font-weight:700;margin-top:1px;}
+  .next-strip .time{
+    font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums;color:var(--ink-muted);font-size:12.5px;
+  }
+
+  /* ---------- ending banner ---------- */
+  .banner{
+    position:sticky;top:calc(env(safe-area-inset-top,0px) + 58px);z-index:4;
+    margin:0 18px;background:var(--amber);color:var(--amber-ink);
+    border-radius:13px;padding:11px 14px;box-shadow:var(--shadow);
+    display:flex;align-items:center;gap:10px;font-size:13px;font-weight:700;
+    animation:slidein .25s ease;
+  }
+  @keyframes slidein{from{opacity:0;transform:translateY(-8px);}to{opacity:1;transform:translateY(0);}}
+
+  /* ---------- ended overlay ---------- */
+  .overlay-backdrop{
+    position:fixed;inset:0;background:rgba(10,14,12,.55);backdrop-filter:blur(2px);
+    display:flex;align-items:center;justify-content:center;z-index:20;padding:24px;
+  }
+  .overlay-card{
+    background:var(--surface);border-radius:22px;padding:30px 26px;max-width:340px;width:100%;
+    text-align:center;box-shadow:var(--shadow);border:1px solid var(--border);
+    animation:pop .25s ease;
+  }
+  @keyframes pop{from{opacity:0;transform:scale(.92);}to{opacity:1;transform:scale(1);}}
+  .overlay-card .bell{
+    width:70px;height:70px;border-radius:50%;background:var(--amber-soft);color:var(--amber);
+    display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 14px;
+    animation:ring 1.1s ease infinite;
+  }
+  @keyframes ring{0%,100%{transform:rotate(0);}20%{transform:rotate(-14deg);}40%{transform:rotate(11deg);}60%{transform:rotate(-7deg);}80%{transform:rotate(4deg);}}
+  .overlay-card h2{font-size:19px;margin-bottom:6px;}
+  .overlay-card p{color:var(--ink-muted);font-size:13.5px;margin:0 0 18px;}
+  .overlay-card .ok{
+    width:100%;background:var(--accent);color:var(--accent-ink);border:none;
+    font-family:"Cairo",sans-serif;font-weight:700;font-size:14.5px;padding:12px;border-radius:12px;
+  }
+
+  /* ---------- settings modal ---------- */
+  .modal-backdrop{
+    position:fixed;inset:0;background:rgba(10,14,12,.5);z-index:25;
+    display:flex;align-items:flex-end;justify-content:center;
+  }
+  @media (min-width:560px){ .modal-backdrop{align-items:center;} }
+  .modal{
+    background:var(--surface);width:100%;max-width:430px;max-height:88vh;
+    border-radius:22px 22px 0 0;display:flex;flex-direction:column;overflow:hidden;
+    box-shadow:var(--shadow);border:1px solid var(--border);
+  }
+  @media (min-width:560px){ .modal{border-radius:20px;max-height:80vh;} }
+  .modal-head{
+    display:flex;align-items:center;justify-content:space-between;padding:16px 18px;
+    border-bottom:1px solid var(--border);flex:0 0 auto;
+  }
+  .modal-head h2{font-size:16.5px;}
+  .modal-body{overflow-y:auto;padding:16px 18px 26px;display:flex;flex-direction:column;gap:22px;}
+
+  .sec-title{font-size:12.5px;font-weight:700;color:var(--ink-faint);letter-spacing:.03em;text-transform:uppercase;margin-bottom:10px;}
+  .field-row{
+    display:flex;align-items:center;justify-content:space-between;gap:12px;
+    padding:11px 0;border-bottom:1px solid var(--border);
+  }
+  .field-row:last-child{border-bottom:none;}
+  .field-row .ft{font-size:14px;font-weight:600;}
+  .field-row .fs{font-size:11.5px;color:var(--ink-faint);margin-top:1px;}
+  .field-row input[type=range]{width:120px;accent-color:var(--accent);}
+  .field-row .num{font-family:"IBM Plex Mono",monospace;font-size:13px;color:var(--accent);font-weight:700;width:26px;text-align:center;}
+
+  .switch{position:relative;width:42px;height:24px;flex:0 0 auto;}
+  .switch input{opacity:0;width:0;height:0;}
+  .switch .track{
+    position:absolute;inset:0;background:var(--surface-3);border-radius:999px;transition:.2s;
+  }
+  .switch .track:before{
+    content:"";position:absolute;width:18px;height:18px;border-radius:50%;background:#fff;
+    top:3px;right:3px;transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.3);
+  }
+  .switch input:checked + .track{background:var(--accent);}
+  .switch input:checked + .track:before{transform:translateX(-18px);}
+
+  .type-toggles{display:flex;flex-wrap:wrap;gap:8px;}
+  .type-toggle{
+    display:flex;align-items:center;gap:7px;border:1px solid var(--border);border-radius:11px;
+    padding:8px 12px;font-size:13px;font-weight:600;background:var(--surface-2);
+  }
+  .type-toggle input{accent-color:var(--accent);}
+
+  .day-tabs{display:flex;gap:6px;background:var(--surface-2);padding:4px;border-radius:11px;}
+  .day-tab{
+    flex:1;text-align:center;padding:8px 6px;border-radius:8px;font-size:12.5px;font-weight:700;
+    color:var(--ink-muted);border:none;background:transparent;
+  }
+  .day-tab.on{background:var(--surface);color:var(--accent);box-shadow:0 1px 3px rgba(0,0,0,.08);}
+
+  .event-row{
+    display:grid;grid-template-columns:1fr auto auto auto auto;gap:6px;align-items:center;
+    padding:8px 0;border-bottom:1px solid var(--border);
+  }
+  .event-row:last-child{border-bottom:none;}
+  .event-row input[type=text]{
+    border:1px solid var(--border);border-radius:8px;padding:7px 8px;font-size:12.5px;
+    background:var(--surface);color:var(--ink);width:100%;
+  }
+  .event-row input[type=time]{
+    border:1px solid var(--border);border-radius:8px;padding:6px 5px;font-size:12px;
+    background:var(--surface);color:var(--ink);width:82px;font-family:"IBM Plex Mono",monospace;
+  }
+  .event-row select{
+    border:1px solid var(--border);border-radius:8px;padding:6px 4px;font-size:11.5px;
+    background:var(--surface);color:var(--ink);
+  }
+  .row-del{
+    width:26px;height:26px;border-radius:7px;border:1px solid var(--border);background:var(--surface);
+    color:var(--danger);font-size:13px;display:flex;align-items:center;justify-content:center;flex:0 0 auto;
+  }
+  .add-row{
+    margin-top:8px;width:100%;border:1px dashed var(--border);background:transparent;color:var(--accent);
+    font-weight:700;font-size:13px;padding:9px;border-radius:10px;
+  }
+
+  .btn-row{display:flex;gap:8px;flex-wrap:wrap;}
+  .btn{
+    flex:1;font-weight:700;font-size:13px;padding:11px 14px;border-radius:11px;border:1px solid var(--border);
+    background:var(--surface-2);color:var(--ink);
+  }
+  .btn.primary{background:var(--accent);color:var(--accent-ink);border-color:transparent;}
+  .btn.danger{background:var(--danger-soft);color:var(--danger);border-color:transparent;}
+  .btn.violet{background:var(--violet-soft);color:var(--violet);border-color:transparent;}
+
+  textarea.json{
+    width:100%;min-height:120px;border:1px solid var(--border);border-radius:10px;
+    background:var(--code-bg,#14201C);color:#DCE8E2;font-family:"IBM Plex Mono",monospace;
+    font-size:11.5px;padding:10px;direction:ltr;text-align:left;resize:vertical;
+  }
+  .note{font-size:11.5px;color:var(--ink-faint);line-height:1.6;}
+  .err{font-size:12px;color:var(--danger);font-weight:600;}
+  .ok-msg{font-size:12px;color:var(--accent);font-weight:600;}
+
+  .foot-note{
+    text-align:center;font-size:10.5px;color:var(--ink-faint);padding:4px 20px 0;
+  }
+</style>
+
+<div id="root"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@700;800&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+<script>
+(function(){
+"use strict";
+var h = React.createElement;
+var useState = React.useState, useEffect = React.useEffect, useRef = React.useRef;
+
+/* ============ constants & data ============ */
+
+var DEFAULT_SCHEDULE = {
+  sunday: [
+    { name: "الاصطفاف", start: "07:00", end: "07:15", type: "assembly" },
+    { name: "الحصة الأولى", start: "07:15", end: "08:00", type: "period" },
+    { name: "الحصة الثانية", start: "08:00", end: "08:40", type: "period" },
+    { name: "الحصة الثالثة", start: "08:40", end: "09:20", type: "period" },
+    { name: "الفسحة", start: "09:20", end: "09:45", type: "break" },
+    { name: "الحصة الرابعة", start: "09:45", end: "10:25", type: "period" },
+    { name: "الحصة الخامسة", start: "10:25", end: "11:05", type: "period" },
+    { name: "الحصة السادسة", start: "11:05", end: "11:45", type: "period" },
+    { name: "الحصة السابعة", start: "11:45", end: "12:25", type: "period" }
+  ],
+  mon_tue_wed: [
+    { name: "الاصطفاف", start: "07:00", end: "07:15", type: "assembly" },
+    { name: "الحصة الأولى", start: "07:15", end: "08:00", type: "period" },
+    { name: "الحصة الثانية", start: "08:00", end: "08:45", type: "period" },
+    { name: "الحصة الثالثة", start: "08:45", end: "09:25", type: "period" },
+    { name: "الفسحة", start: "09:25", end: "09:50", type: "break" },
+    { name: "الحصة الرابعة", start: "09:50", end: "10:30", type: "period" },
+    { name: "الحصة الخامسة", start: "10:30", end: "11:10", type: "period" },
+    { name: "الحصة السادسة", start: "11:10", end: "11:50", type: "period" }
+  ],
+  thursday: [
+    { name: "الاصطفاف", start: "07:00", end: "07:15", type: "assembly" },
+    { name: "الحصة الأولى", start: "07:15", end: "07:55", type: "period" },
+    { name: "الحصة الثانية", start: "07:55", end: "08:35", type: "period" },
+    { name: "الحصة الثالثة", start: "08:35", end: "09:15", type: "period" },
+    { name: "الفسحة", start: "09:15", end: "09:35", type: "break" },
+    { name: "حصة النشاط", start: "09:35", end: "10:05", type: "activity" },
+    { name: "الحصة الرابعة", start: "10:05", end: "10:45", type: "period" },
+    { name: "الحصة الخامسة", start: "10:45", end: "11:20", type: "period" },
+    { name: "الحصة السادسة", start: "11:20", end: "11:50", type: "period" }
+  ]
+};
+
+var DAY_LABELS = { sunday: "الأحد", mon_tue_wed: "الاثنين – الثلاثاء – الأربعاء", thursday: "الخميس" };
+var DAY_ORDER = ["sunday", "mon_tue_wed", "thursday"];
+var DAY_NAMES = ["الأحد","الاثنين","الثلاثاء","الأربعاء","الخميس","الجمعة","السبت"];
+var DAY_TO_KEY = { 0:"sunday", 1:"mon_tue_wed", 2:"mon_tue_wed", 3:"mon_tue_wed", 4:"thursday", 5:null, 6:null };
+var TYPE_META = {
+  period:   { label:"حصة",    icon:"📘", color:"var(--accent)" },
+  activity: { label:"نشاط",   icon:"🎯", color:"var(--violet)" },
+  assembly: { label:"اصطفاف", icon:"🚩", color:"var(--amber)" },
+  break:    { label:"فسحة",   icon:"☕", color:"var(--ink-muted)" }
+};
+var DEFAULT_SETTINGS = {
+  leadMinutes: 4,
+  soundOn: true,
+  vibrationOn: true,
+  alertsByType: { period:true, activity:true, assembly:false, break:false }
+};
+var KEY_SCHED = "meeqat.schedule.v1";
+var KEY_SETTINGS = "meeqat.settings.v1";
+
+/* ============ helpers ============ */
+
+function pad2(n){ return n < 10 ? "0"+n : ""+n; }
+
+function riyadhNow(){
+  try{ return new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Riyadh" })); }
+  catch(e){ return new Date(); }
+}
+
+function fmtClock(d){
+  return DAY_NAMES[d.getDay()] + " · " + pad2(d.getHours()) + ":" + pad2(d.getMinutes()) + ":" + pad2(d.getSeconds());
+}
+
+function fmtCountdown(ms){
+  var s = Math.max(0, Math.round(ms/1000));
+  return pad2(Math.floor(s/60)) + ":" + pad2(s%60);
+}
+
+function fmtTime(hhmm){ return hhmm; }
+
+function loadSchedule(){
+  try{
+    var raw = localStorage.getItem(KEY_SCHED);
+    if(raw){
+      var p = JSON.parse(raw);
+      if(p && p.sunday && p.mon_tue_wed && p.thursday) return p;
+    }
+  }catch(e){}
+  return DEFAULT_SCHEDULE;
+}
+function saveSchedule(s){ try{ localStorage.setItem(KEY_SCHED, JSON.stringify(s)); }catch(e){} }
+
+function loadSettings(){
+  try{
+    var raw = localStorage.getItem(KEY_SETTINGS);
+    if(raw){
+      var p = JSON.parse(raw);
+      return Object.assign({}, DEFAULT_SETTINGS, p, { alertsByType: Object.assign({}, DEFAULT_SETTINGS.alertsByType, p.alertsByType||{}) });
+    }
+  }catch(e){}
+  return DEFAULT_SETTINGS;
+}
+function saveSettings(s){ try{ localStorage.setItem(KEY_SETTINGS, JSON.stringify(s)); }catch(e){} }
+
+function buildTodayEvents(schedule, nowDate){
+  var key = DAY_TO_KEY[nowDate.getDay()];
+  if(!key) return { key: null, events: [] };
+  var list = schedule[key] || [];
+  var y = nowDate.getFullYear(), m = nowDate.getMonth(), d = nowDate.getDate();
+  var events = list.map(function(ev, idx){
+    var sp = ev.start.split(":"), ep = ev.end.split(":");
+    var startMs = new Date(y, m, d, +sp[0], +sp[1], 0, 0).getTime();
+    var endMs = new Date(y, m, d, +ep[0], +ep[1], 0, 0).getTime();
+    return { name: ev.name, type: ev.type, start: ev.start, end: ev.end, id: key+"-"+idx, startMs: startMs, endMs: endMs };
+  });
+  return { key: key, events: events };
+}
+
+function buildDemoEvents(startDate){
+  var base = startDate.getTime();
+  var plan = [
+    { name:"حصة تجريبية",         type:"period",   offset:0,  duration:25, leadSec:8 },
+    { name:"الفسحة",              type:"break",    offset:25, duration:10, leadSec:4 },
+    { name:"حصة نشاط تجريبية",    type:"activity", offset:35, duration:23, leadSec:7 }
+  ];
+  return plan.map(function(p, idx){
+    return {
+      name:p.name, type:p.type, id:"demo-"+idx,
+      startMs: base + p.offset*1000, endMs: base + (p.offset+p.duration)*1000,
+      leadSec: p.leadSec
+    };
+  });
+}
+
+/* ============ audio & vibration ============ */
+
+function makeSound(){
+  var ctx = null;
+  function ensure(){
+    if(!ctx){
+      try{ var C = window.AudioContext || window.webkitAudioContext; ctx = new C(); }catch(e){ ctx = null; }
+    }
+    if(ctx && ctx.state === "suspended"){ ctx.resume().catch(function(){}); }
+    return ctx;
+  }
+  function tone(freqs, opts){
+    opts = opts || {};
+    var c = ensure(); if(!c) return;
+    var t = c.currentTime;
+    var dur = opts.dur || 0.16, gap = opts.gap != null ? opts.gap : dur + 0.06, vol = opts.vol || 0.22;
+    freqs.forEach(function(f){
+      var osc = c.createOscillator(), gain = c.createGain();
+      osc.type = opts.wave || "sine";
+      osc.frequency.value = f;
+      gain.gain.setValueAtTime(0.0001, t);
+      gain.gain.linearRampToValueAtTime(vol, t + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+      osc.connect(gain); gain.connect(c.destination);
+      osc.start(t); osc.stop(t + dur + 0.03);
+      t += gap;
+    });
+  }
+  return {
+    unlock: ensure,
+    lead: function(){ tone([880, 1174.7], { dur:0.13, gap:0.16, vol:0.18 }); },
+    end: function(){ tone([1318.5, 1318.5, 1318.5], { dur:0.2, gap:0.24, vol:0.26 }); },
+    tap: function(){ tone([660], { dur:0.08, gap:0.1, vol:0.12 }); }
+  };
+}
+
+function vibrate(pattern, on){
+  if(!on) return;
+  try{ if(navigator.vibrate) navigator.vibrate(pattern); }catch(e){}
+}
+
+/* ============ small UI pieces ============ */
+
+function ProgressRing(props){
+  var size = 196, sw = 14, r = (size - sw) / 2, c = 2 * Math.PI * r;
+  var frac = Math.max(0, Math.min(1, props.fraction));
+  var off = c * (1 - frac);
+  return h("div", { className:"ring-wrap" },
+    h("svg", { viewBox: "0 0 " + size + " " + size },
+      h("circle", { cx:size/2, cy:size/2, r:r, fill:"none", stroke:"var(--border)", strokeWidth:sw }),
+      h("circle", {
+        cx:size/2, cy:size/2, r:r, fill:"none",
+        stroke: props.alerting ? "var(--amber)" : "var(--accent)",
+        strokeWidth:sw, strokeLinecap:"round",
+        strokeDasharray: c, strokeDashoffset: off,
+        style:{ transition:"stroke-dashoffset .4s linear, stroke .3s" }
+      })
+    ),
+    h("div", { className:"ring-center" },
+      h("div", { className:"timer" }, props.timerText),
+      h("div", { className:"label" }, props.subText)
+    )
+  );
+}
+
+function IconBtn(props){
+  var cls = "icon-btn" + (props.active ? " active" : "") + (props.mutedStyle ? " muted" : "");
+  return h("button", { className:cls, onClick:props.onClick, title:props.title, "aria-label":props.title }, props.children);
+}
+
+/* ============ state screens ============ */
+
+function StateScreen(props){
+  return h("div", { className:"state-screen" },
+    h("div", { className:"icon", style:{ background: props.iconBg, color: props.iconColor } }, props.icon),
+    h("h2", null, props.title),
+    props.desc ? h("p", null, props.desc) : null,
+    props.countdown ? h("div", { className:"countdown" }, props.countdown) : null,
+    props.onDemo ? h("button", { className:"ghost-btn", onClick:props.onDemo }, "▶ تجربة العرض التوضيحي") : null
+  );
+}
+
+/* ============ event card ============ */
+
+function EventArea(props){
+  var ev = props.event, next = props.next, nowMs = props.nowMs, alerting = props.alerting;
+  var meta = TYPE_META[ev.type] || TYPE_META.period;
+  var frac = (nowMs - ev.startMs) / (ev.endMs - ev.startMs);
+  var remain = ev.endMs - nowMs;
+  return h(React.Fragment, null,
+    h("div", { className:"event-card" + (alerting ? " alerting" : "") },
+      h("div", { className:"type-chip" }, meta.icon + " " + meta.label),
+      h(ProgressRing, {
+        fraction: frac, alerting: alerting,
+        timerText: fmtCountdown(remain),
+        subText: alerting ? "قارب على الانتهاء" : "الوقت المتبقي"
+      }),
+      h("div", { className:"event-name" }, ev.name)
+    ),
+    h("div", { className:"next-strip" },
+      h("div", null,
+        h("div", { className:"lbl" }, next ? "التالي" : "آخر حدث اليوم"),
+        h("div", { className:"val" }, next ? next.name : "لا مزيد بعد هذا الحدث")
+      ),
+      next ? h("div", { className:"time" }, next.start || fmtCountdown(next.startMs - nowMs)) : null
+    )
+  );
+}
+
+/* ============ settings modal ============ */
+
+function ScheduleDayEditor(props){
+  var dayKey = props.dayKey, events = props.events, onChange = props.onChange;
+  function update(idx, field, val){
+    var next = events.map(function(e,i){ return i===idx ? Object.assign({}, e, { [field]: val }) : e; });
+    onChange(next);
+  }
+  function remove(idx){ onChange(events.filter(function(_,i){ return i!==idx; })); }
+  function add(){
+    onChange(events.concat([{ name:"حدث جديد", start:"07:00", end:"07:30", type:"period" }]));
+  }
+  return h("div", null,
+    events.map(function(ev, idx){
+      return h("div", { className:"event-row", key: dayKey+idx },
+        h("input", { type:"text", value:ev.name, onChange:function(e){ update(idx,"name",e.target.value); } }),
+        h("input", { type:"time", value:ev.start, onChange:function(e){ update(idx,"start",e.target.value); } }),
+        h("input", { type:"time", value:ev.end, onChange:function(e){ update(idx,"end",e.target.value); } }),
+        h("select", { value:ev.type, onChange:function(e){ update(idx,"type",e.target.value); } },
+          Object.keys(TYPE_META).map(function(t){ return h("option", { value:t, key:t }, TYPE_META[t].label); })
+        ),
+        h("button", { className:"row-del", onClick:function(){ remove(idx); }, title:"حذف" }, "✕")
+      );
+    }),
+    h("button", { className:"add-row", onClick:add }, "+ إضافة حدث")
+  );
+}
+
+function SettingsModal(props){
+  var settings = props.settings, setSettings = props.setSettings;
+  var schedule = props.schedule, setSchedule = props.setSchedule;
+  var onClose = props.onClose;
+  var tabsState = useState("sunday"); var activeDay = tabsState[0], setActiveDay = tabsState[1];
+  var jsonState = useState(""); var importText = jsonState[0], setImportText = jsonState[1];
+  var msgState = useState(null); var msg = msgState[0], setMsg = msgState[1];
+
+  function patchSettings(patch){ setSettings(Object.assign({}, settings, patch)); }
+  function patchAlertType(type, val){
+    setSettings(Object.assign({}, settings, { alertsByType: Object.assign({}, settings.alertsByType, { [type]: val }) }));
+  }
+  function updateDay(dayKey, events){ setSchedule(Object.assign({}, schedule, { [dayKey]: events })); }
+  function resetSchedule(){ setSchedule(DEFAULT_SCHEDULE); setMsg({ ok:true, text:"تمت استعادة الجدول الرسمي الافتراضي." }); }
+  function doExport(){ setImportText(JSON.stringify(schedule, null, 2)); setMsg(null); }
+  function doImport(){
+    try{
+      var parsed = JSON.parse(importText);
+      if(!parsed.sunday || !parsed.mon_tue_wed || !parsed.thursday) throw new Error("missing keys");
+      setSchedule(parsed);
+      setMsg({ ok:true, text:"تم استيراد الجدول بنجاح." });
+    }catch(e){
+      setMsg({ ok:false, text:"تعذّر الاستيراد — تأكد أن النص JSON صالح ويحتوي على sunday و mon_tue_wed و thursday." });
+    }
+  }
+
+  return h("div", { className:"modal-backdrop", onClick:function(e){ if(e.target===e.currentTarget) onClose(); } },
+    h("div", { className:"modal" },
+      h("div", { className:"modal-head" },
+        h("h2", null, "الإعدادات"),
+        h("button", { className:"icon-btn", onClick:onClose, "aria-label":"إغلاق" }, "✕")
+      ),
+      h("div", { className:"modal-body" },
+
+        h("div", null,
+          h("div", { className:"sec-title" }, "التنبيهات"),
+          h("div", { className:"field-row" },
+            h("div", null, h("div", { className:"ft" }, "مدة التنبيه المسبق"), h("div", { className:"fs" }, "قبل نهاية الحصة بدقائق")),
+            h("div", { style:{ display:"flex", alignItems:"center", gap:8 } },
+              h("input", { type:"range", min:3, max:5, step:1, value:settings.leadMinutes,
+                onChange:function(e){ patchSettings({ leadMinutes:+e.target.value }); } }),
+              h("span", { className:"num" }, settings.leadMinutes)
+            )
+          ),
+          h("div", { className:"field-row" },
+            h("div", null, h("div", { className:"ft" }, "الصوت"), h("div", { className:"fs" }, "نغمة تنبيه عبر مكبر الجهاز")),
+            h("label", { className:"switch" },
+              h("input", { type:"checkbox", checked:settings.soundOn, onChange:function(e){ patchSettings({ soundOn:e.target.checked }); } }),
+              h("span", { className:"track" })
+            )
+          ),
+          h("div", { className:"field-row" },
+            h("div", null, h("div", { className:"ft" }, "الاهتزاز"), h("div", { className:"fs" }, "قد لا يعمل داخل هذه المعاينة على كل الأجهزة")),
+            h("label", { className:"switch" },
+              h("input", { type:"checkbox", checked:settings.vibrationOn, onChange:function(e){ patchSettings({ vibrationOn:e.target.checked }); } }),
+              h("span", { className:"track" })
+            )
+          ),
+          h("div", { style:{ marginTop:10 } },
+            h("div", { className:"fs", style:{ marginBottom:8 } }, "تفعيل التنبيه حسب نوع الحدث"),
+            h("div", { className:"type-toggles" },
+              Object.keys(TYPE_META).map(function(t){
+                return h("label", { className:"type-toggle", key:t },
+                  h("input", { type:"checkbox", checked:!!settings.alertsByType[t], onChange:function(e){ patchAlertType(t, e.target.checked); } }),
+                  h("span", null, TYPE_META[t].icon + " " + TYPE_META[t].label)
+                );
+              })
+            )
+          )
+        ),
+
+        h("div", null,
+          h("div", { className:"sec-title" }, "الجدول الدراسي"),
+          h("div", { className:"day-tabs" },
+            DAY_ORDER.map(function(k){
+              return h("button", { key:k, className:"day-tab" + (activeDay===k ? " on" : ""), onClick:function(){ setActiveDay(k); } }, DAY_LABELS[k]);
+            })
+          ),
+          h("div", { style:{ marginTop:10 } },
+            h(ScheduleDayEditor, { dayKey:activeDay, events:schedule[activeDay], onChange:function(ev){ updateDay(activeDay, ev); } })
+          ),
+          h("div", { className:"btn-row", style:{ marginTop:12 } },
+            h("button", { className:"btn danger", onClick:resetSchedule }, "استعادة الجدول الرسمي")
+          )
+        ),
+
+        h("div", null,
+          h("div", { className:"sec-title" }, "استيراد / تصدير JSON"),
+          h("textarea", { className:"json", value:importText, onChange:function(e){ setImportText(e.target.value); },
+            placeholder:"الصق هنا بنية JSON لجدول جديد، أو اضغط تصدير لعرض الجدول الحالي" }),
+          h("div", { className:"btn-row", style:{ marginTop:8 } },
+            h("button", { className:"btn", onClick:doExport }, "تصدير الحالي"),
+            h("button", { className:"btn primary", onClick:doImport }, "استيراد وتطبيق")
+          ),
+          msg ? h("div", { className: msg.ok ? "ok-msg" : "err", style:{ marginTop:8 } }, msg.text) : null
+        )
+      )
+    )
+  );
+}
+
+/* ============ overlays ============ */
+
+function EndingBanner(props){
+  var ev = props.event;
+  return h("div", { className:"banner" }, "🔔 تبقّى " + fmtCountdown(props.remainMs) + " على نهاية " + ev.name);
+}
+
+function EndedOverlay(props){
+  var ev = props.event, next = props.next;
+  return h("div", { className:"overlay-backdrop" },
+    h("div", { className:"overlay-card" },
+      h("div", { className:"bell" }, "🔔"),
+      h("h2", null, "انتهى وقت: " + ev.name),
+      h("p", null, next ? ("التالي: " + next.name + " — الساعة " + (next.start || "")) : "لا يوجد حدث آخر اليوم"),
+      h("button", { className:"ok", onClick:props.onClose }, "حسنًا")
+    )
+  );
+}
+
+/* ============ app ============ */
+
+function App(){
+  var startedState = useState(false); var started = startedState[0], setStarted = startedState[1];
+  var nowState = useState(riyadhNow()); var now = nowState[0], setNow = nowState[1];
+  var schedState = useState(loadSchedule()); var schedule = schedState[0], setSchedule = schedState[1];
+  var settState = useState(loadSettings()); var settings = settState[0], setSettings = settState[1];
+  var settingsOpenState = useState(false); var settingsOpen = settingsOpenState[0], setSettingsOpen = settingsOpenState[1];
+  var demoState = useState(false); var demoMode = demoState[0], setDemoMode = demoState[1];
+  var overlayState = useState(null); var overlay = overlayState[0], setOverlay = overlayState[1];
+
+  var demoEventsRef = useRef(null);
+  var alertMapRef = useRef({});
+  var soundRef = useRef(null);
+  var overlayTimerRef = useRef(null);
+
+  if(!soundRef.current) soundRef.current = makeSound();
+
+  useEffect(function(){
+    var t = setInterval(function(){ setNow(riyadhNow()); }, 1000);
+    return function(){ clearInterval(t); };
+  }, []);
+
+  useEffect(function(){ saveSettings(settings); }, [settings]);
+  useEffect(function(){ saveSchedule(schedule); }, [schedule]);
+
+  var liveBuilt = buildTodayEvents(schedule, now);
+  var dayKey = liveBuilt.key;
+  var liveEvents = liveBuilt.events;
+  var activeEvents = demoMode ? (demoEventsRef.current || []) : liveEvents;
+  var nowMs = now.getTime();
+  var currentEvent = null, nextEvent = null;
+  for(var i=0;i<activeEvents.length;i++){
+    var e = activeEvents[i];
+    if(nowMs >= e.startMs && nowMs < e.endMs){ currentEvent = e; nextEvent = activeEvents[i+1] || null; break; }
+    if(nowMs < e.startMs){ nextEvent = e; break; }
+  }
+  var isAlerting = false, remainMs = 0;
+  if(currentEvent){
+    remainMs = currentEvent.endMs - nowMs;
+    var leadMs = demoMode ? (currentEvent.leadSec||6)*1000 : settings.leadMinutes*60000;
+    isAlerting = remainMs <= leadMs;
+  }
+
+  // reset per-event alert tracking when the active list identity changes
+  useEffect(function(){ alertMapRef.current = {}; }, [dayKey, demoMode, schedule]);
+
+  // scan for lead/end alert transitions every tick
+  useEffect(function(){
+    var built = demoMode ? (demoEventsRef.current || []) : buildTodayEvents(schedule, now).events;
+    var nm = now.getTime();
+    built.forEach(function(ev, idx){
+      var state = alertMapRef.current[ev.id] || {};
+      var allowed = demoMode ? true : !!settings.alertsByType[ev.type];
+      var leadMs2 = demoMode ? (ev.leadSec||6)*1000 : settings.leadMinutes*60000;
+
+      if(nm >= ev.endMs){
+        if(!state.ended){
+          state.ended = true;
+          if(allowed){
+            soundRef.current.end();
+            vibrate([160,80,160,80,220], settings.vibrationOn);
+            var nxt = built[idx+1] || null;
+            setOverlay({ type:"ended", event: ev, next: nxt });
+            if(overlayTimerRef.current) clearTimeout(overlayTimerRef.current);
+            overlayTimerRef.current = setTimeout(function(){
+              setOverlay(function(o){ return (o && o.type === "ended" && o.event.id === ev.id) ? null : o; });
+            }, 4000);
+          }
+        }
+      } else if(nm >= ev.endMs - leadMs2){
+        if(!state.alerted){
+          state.alerted = true;
+          if(allowed){
+            soundRef.current.lead();
+            vibrate([120], settings.vibrationOn);
+            setOverlay({ type:"ending", event: ev, remainMs: ev.endMs - nm });
+            if(overlayTimerRef.current) clearTimeout(overlayTimerRef.current);
+            overlayTimerRef.current = setTimeout(function(){
+              setOverlay(function(o){ return (o && o.type === "ending") ? null : o; });
+            }, 4000);
+          }
+        }
+      }
+      alertMapRef.current[ev.id] = state;
+    });
+  }, [now, demoMode, schedule, settings]);
+
+  // auto-exit demo after it finishes playing
+  useEffect(function(){
+    if(demoMode && demoEventsRef.current && demoEventsRef.current.length){
+      var last = demoEventsRef.current[demoEventsRef.current.length-1];
+      if(now.getTime() > last.endMs + 3000){
+        setDemoMode(false); demoEventsRef.current = null;
+      }
+    }
+  }, [now, demoMode]);
+
+  function startApp(){
+    setStarted(true);
+    soundRef.current.unlock();
+    soundRef.current.tap();
+  }
+  function startDemo(){
+    demoEventsRef.current = buildDemoEvents(riyadhNow());
+    alertMapRef.current = {};
+    setOverlay(null);
+    setDemoMode(true);
+    setSettingsOpen(false);
+  }
+  function stopDemo(){
+    setDemoMode(false);
+    demoEventsRef.current = null;
+    setOverlay(null);
+  }
+  function toggleMute(){ setSettings(Object.assign({}, settings, { soundOn: !settings.soundOn })); }
+
+  if(!started){
+    return h("div", { className:"frame" },
+      h("div", { className:"gate" },
+        h("div", { className:"mark" }, "🔔"),
+        h("h1", null, "ميقات"),
+        h("p", null, "المساعد الذكي لإدارة الحصص المدرسية — عدّاد وتنبيهات صوتية تلقائية حسب جدولك الرسمي."),
+        h("button", { className:"go", onClick:startApp }, "ابدأ"),
+        h("div", { className:"hint" }, "يفعّل الضغط الصوت والاهتزاز لهذه الجلسة")
+      )
+    );
+  }
+
+  var mainContent;
+  if(demoMode){
+    if(currentEvent){
+      mainContent = h(EventArea, { event: currentEvent, next: nextEvent, nowMs: nowMs, alerting: isAlerting });
+    } else {
+      mainContent = h(StateScreen, {
+        icon:"⏳", iconBg:"var(--violet-soft)", iconColor:"var(--violet)",
+        title:"جارٍ إنهاء العرض التجريبي…", desc:"سيعود التطبيق تلقائيًا للوضع المباشر خلال لحظات."
+      });
+    }
+  } else if(dayKey === null){
+    mainContent = h(StateScreen, {
+      icon:"🌤️", iconBg:"var(--accent-soft)", iconColor:"var(--accent)",
+      title:"عطلة نهاية الأسبوع", desc:"لا توجد حصص دراسية اليوم (الجمعة والسبت). عد يوم الأحد.",
+      onDemo:startDemo
+    });
+  } else if(!currentEvent && nextEvent){
+    var isFirst = liveEvents.length && nextEvent.id === liveEvents[0].id;
+    mainContent = h(StateScreen, {
+      icon: isFirst ? "🚩" : "⏳", iconBg:"var(--accent-soft)", iconColor:"var(--accent)",
+      title: isFirst ? "الدوام لم يبدأ بعد" : "بانتظار الحدث التالي",
+      desc: nextEvent.name + " — الساعة " + nextEvent.start,
+      countdown: fmtCountdown(nextEvent.startMs - nowMs),
+      onDemo:startDemo
+    });
+  } else if(!currentEvent && !nextEvent){
+    mainContent = h(StateScreen, {
+      icon:"✅", iconBg:"var(--accent-soft)", iconColor:"var(--accent)",
+      title:"انتهى الدوام الدراسي لليوم", desc:"جميع حصص اليوم اكتملت. نراك في اليوم الدراسي القادم.",
+      onDemo:startDemo
+    });
+  } else {
+    mainContent = h(EventArea, { event: currentEvent, next: nextEvent, nowMs: nowMs, alerting: isAlerting });
+  }
+
+  return h("div", { className:"frame" },
+    h("div", { className:"header" },
+      h("div", null,
+        h("div", { className:"brand" }, h("span", { className:"dot" }), h("b", null, "ميقات")),
+        h("div", { className:"clock" }, fmtClock(now) + (demoMode ? " · تجريبي" : ""))
+      ),
+      h("div", { className:"actions" },
+        h(IconBtn, { title: demoMode ? "إنهاء التجربة" : "تجربة توضيحية", active:demoMode, onClick: demoMode ? stopDemo : startDemo }, demoMode ? "■" : "▶"),
+        h(IconBtn, { title: settings.soundOn ? "كتم الصوت" : "تفعيل الصوت", mutedStyle: !settings.soundOn, onClick:toggleMute }, settings.soundOn ? "🔊" : "🔇"),
+        h(IconBtn, { title:"الإعدادات", onClick:function(){ setSettingsOpen(true); } }, "⚙️")
+      )
+    ),
+
+    overlay && overlay.type === "ending" ? h(EndingBanner, { event: overlay.event, remainMs: overlay.remainMs }) : null,
+
+    h("div", { className:"content" },
+      demoMode ? h("div", { className:"demo-strip" },
+        h("span", null, "▶ وضع العرض التجريبي — يعرض دورة كاملة من التنبيهات خلال ثوانٍ"),
+        h("button", { onClick:stopDemo }, "إنهاء")
+      ) : null,
+      mainContent
+    ),
+
+    h("div", { className:"foot-note" }, "معاينة تفاعلية كاملة الوظائف — عند نشر التطبيق كموقع مستقل يُضاف Service Worker وManifest للتثبيت الكامل على الشاشة الرئيسية."),
+
+    overlay && overlay.type === "ended" ? h(EndedOverlay, { event: overlay.event, next: overlay.next, onClose:function(){ setOverlay(null); } }) : null,
+    settingsOpen ? h(SettingsModal, { settings:settings, setSettings:setSettings, schedule:schedule, setSchedule:setSchedule, onClose:function(){ setSettingsOpen(false); } }) : null
+  );
+}
+
+var root = ReactDOM.createRoot(document.getElementById("root"));
+root.render(h(App));
+
+})();
+</script>
